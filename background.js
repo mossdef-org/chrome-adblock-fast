@@ -72,7 +72,11 @@ async function pollStatus() {
 			compatWarning: compatWarning,
 		});
 	} catch (e) {
-		await updateIcon('unknown');
+		// Don't overwrite icon/state for transient session expiry
+		const session = await getSessionState();
+		if (!session.lastStatus || e.code !== UBUS_STATUS_PERMISSION_DENIED) {
+			await updateIcon('unknown');
+		}
 		await saveSessionState({
 			lastError: e.message,
 			lastPoll: Date.now(),
