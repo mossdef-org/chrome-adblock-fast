@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "AdBlock-Fast Controller",
-	"version": "1.0.0",
+	"version": "1.2.2.12",
 	"description": "Control adblock-fast on your OpenWrt router from the Chrome toolbar",
 	"permissions": [
 		"storage",
