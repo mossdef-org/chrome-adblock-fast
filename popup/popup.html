@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+	<div class="container">
+		<div class="header">AdBlock-Fast</div>
+
+		<div id="notConfigured" class="notice" hidden>
+			<p>Extension not configured.</p>
+			<a href="#" id="openSettings">Open Settings</a>
+		</div>
+
+		<div id="statusPanel" hidden>
+			<div class="status-row">
+				<span class="status-label">Status</span>
+				<span id="statusValue" class="status-value">--</span>
+			</div>
+			<div class="status-row">
+				<span class="status-label">Domains blocked</span>
+				<span id="entriesValue" class="status-value">--</span>
+			</div>
+			<div class="status-row">
+				<span class="status-label">Version</span>
+				<span id="versionValue" class="status-value">--</span>
+			</div>
+
+			<div id="errorBox" class="error-box" hidden></div>
+
+			<div class="button-row">
+				<button id="btnStart" class="btn btn-start" disabled>Start</button>
+				<button id="btnStop" class="btn btn-stop" disabled>Stop</button>
+				<button id="btnPause" class="btn btn-pause" disabled>Pause</button>
+			</div>
+		</div>
+
+		<div class="footer">
+			<a href="#" id="footerSettings">Settings</a>
+		</div>
+	</div>
+
+	<script src="popup.js" type="module"></script>
+</body>
+</html>

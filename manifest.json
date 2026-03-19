@@ -1,0 +1,32 @@
+{
+	"manifest_version": 3,
+	"name": "AdBlock-Fast Controller",
+	"version": "1.0.0",
+	"description": "Control adblock-fast on your OpenWrt router from the Chrome toolbar",
+	"permissions": [
+		"storage",
+		"alarms"
+	],
+	"host_permissions": [
+		"https://*/ubus",
+		"http://*/ubus"
+	],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"action": {
+		"default_popup": "popup/popup.html",
+		"default_icon": {
+			"16": "icons/icon-unknown-16.png",
+			"32": "icons/icon-unknown-32.png",
+			"48": "icons/icon-unknown-48.png",
+			"128": "icons/icon-unknown-128.png"
+		}
+	},
+	"options_page": "settings/settings.html",
+	"icons": {
+		"16": "icons/icon-active-16.png",
+		"48": "icons/icon-active-48.png",
+		"128": "icons/icon-active-128.png"
+	}
+}
