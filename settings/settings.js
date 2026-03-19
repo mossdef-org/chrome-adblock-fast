@@ -34,7 +34,7 @@ async function saveSettings() {
 		routerUrl: elRouterUrl.value.trim().replace(/\/+$/, ''),
 		username: elUsername.value.trim(),
 		password: elPassword.value,
-		pollInterval: Math.max(10, Math.min(300, parseInt(elPollInterval.value) || 30)),
+		pollInterval: Math.max(10, Math.min(240, parseInt(elPollInterval.value) || 30)),
 	};
 
 	if (!config.routerUrl) {

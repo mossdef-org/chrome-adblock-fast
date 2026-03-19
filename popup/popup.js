@@ -73,11 +73,11 @@ function updateUI(data) {
 	// Domains blocked
 	elEntriesValue.textContent = (status && status.entries) ? status.entries.toLocaleString() : '--';
 
-	// Error / warning box
+	// Error / warning box — don't show stale errors if status is valid
 	if (data.compatWarning) {
 		elErrorBox.textContent = data.compatWarning;
 		elErrorBox.hidden = false;
-	} else if (data.lastError && !isPaused) {
+	} else if (data.lastError && !isPaused && !status) {
 		elErrorBox.textContent = data.lastError;
 		elErrorBox.hidden = false;
 	} else {
