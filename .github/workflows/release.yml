@@ -1,0 +1,57 @@
+name: Build and Release Chrome Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate icons
+        run: node scripts/generate-icons.js
+
+      - name: Get version from manifest
+        id: version
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create packed extension (zip)
+        run: |
+          zip -r "chrome-adblock-fast-${{ steps.version.outputs.version }}.zip" \
+            manifest.json \
+            background.js \
+            popup/ \
+            settings/ \
+            lib/ \
+            icons/ \
+            PRIVACY.md \
+            LICENSE \
+            -x '*.git*' 'scripts/*' 'node_modules/*'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-adblock-fast-${{ steps.version.outputs.version }}
+          path: chrome-adblock-fast-${{ steps.version.outputs.version }}.zip
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: chrome-adblock-fast-${{ steps.version.outputs.version }}.zip
+          generate_release_notes: true
