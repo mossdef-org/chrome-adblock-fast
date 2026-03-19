@@ -77,8 +77,11 @@ function updateUI(data) {
 		elVersionValue.textContent = '--';
 	}
 
-	// Error box
-	if (data.lastError && !isPaused) {
+	// Error / warning box
+	if (data.compatWarning) {
+		elErrorBox.textContent = data.compatWarning;
+		elErrorBox.hidden = false;
+	} else if (data.lastError && !isPaused) {
 		elErrorBox.textContent = data.lastError;
 		elErrorBox.hidden = false;
 	} else {

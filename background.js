@@ -9,6 +9,7 @@ import {
 
 import {
 	resolveState,
+	checkCompat,
 	updateIcon,
 	updateBadge,
 	getConfig,
@@ -61,12 +62,14 @@ async function pollStatus() {
 
 		session = await getSessionState();
 		const state = resolveState(status, session.pauseEndTime);
+		const compatWarning = checkCompat(status);
 		await updateIcon(state);
 		await updateBadge(status);
 		await saveSessionState({
 			lastStatus: status,
 			lastPoll: Date.now(),
 			lastError: null,
+			compatWarning: compatWarning,
 		});
 	} catch (e) {
 		await updateIcon('unknown');
@@ -132,6 +135,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 				status: session.lastStatus,
 				pauseEndTime: session.pauseEndTime,
 				lastError: session.lastError,
+				compatWarning: session.compatWarning,
 				configured: !!(config.routerUrl && config.password),
 			});
 		})();
