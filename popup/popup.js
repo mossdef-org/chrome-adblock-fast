@@ -4,8 +4,10 @@ import { formatPauseTimeout } from '../lib/state.js';
 
 const elNotConfigured = document.getElementById('notConfigured');
 const elStatusPanel = document.getElementById('statusPanel');
-const elStatusLine = document.getElementById('statusLine');
-const elDetailLine = document.getElementById('detailLine');
+const elStatusValue = document.getElementById('statusValue');
+const elVersionValue = document.getElementById('versionValue');
+const elDnsValue = document.getElementById('dnsValue');
+const elEntriesValue = document.getElementById('entriesValue');
 const elErrorBox = document.getElementById('errorBox');
 const btnStart = document.getElementById('btnStart');
 const btnStop = document.getElementById('btnStop');
@@ -49,31 +51,27 @@ function updateUI(data) {
 	const status = data.status;
 	const isPaused = data.pauseEndTime && Date.now() < data.pauseEndTime;
 
-	// Status line: "Version 1.2.2-r12 - Active"
+	// Status
 	if (isPaused) {
-		const ver = (status && status.version) || '';
-		elStatusLine.textContent = ver ? 'Version ' + ver + ' - Paused' : 'Paused';
-		elStatusLine.className = 'info-line paused';
+		elStatusValue.textContent = 'Paused';
+		elStatusValue.className = 'status-value paused';
 	} else if (status) {
 		const label = STATUS_LABELS[status.status] || status.status || 'Unknown';
-		const ver = status.version || '';
-		elStatusLine.textContent = ver ? 'Version ' + ver + ' - ' + label : label;
-		elStatusLine.className = 'info-line ' + data.state;
+		elStatusValue.textContent = label;
+		elStatusValue.className = 'status-value ' + data.state;
 	} else {
-		const label = data.lastError ? 'Error' : 'Unknown';
-		elStatusLine.textContent = label;
-		elStatusLine.className = 'info-line unknown';
+		elStatusValue.textContent = data.lastError ? 'Error' : 'Unknown';
+		elStatusValue.className = 'status-value unknown';
 	}
 
-	// Detail line: "Blocking 597,856 domains (with dnsmasq.servers)"
-	if (status && status.entries) {
-		let detail = 'Blocking ' + status.entries.toLocaleString() + ' domains';
-		if (status.dns) detail += ' (with ' + status.dns + ')';
-		elDetailLine.textContent = detail;
-		elDetailLine.hidden = false;
-	} else {
-		elDetailLine.hidden = true;
-	}
+	// Version
+	elVersionValue.textContent = (status && status.version) || '--';
+
+	// Backend
+	elDnsValue.textContent = (status && status.dns) || '--';
+
+	// Domains blocked
+	elEntriesValue.textContent = (status && status.entries) ? status.entries.toLocaleString() : '--';
 
 	// Error / warning box
 	if (data.compatWarning) {
