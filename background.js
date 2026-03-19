@@ -72,12 +72,10 @@ async function pollStatus() {
 			compatWarning: compatWarning,
 		});
 	} catch (e) {
-		// Don't overwrite icon/state for transient session expiry
-		const session = await getSessionState();
-		if (!session.lastStatus || e.code !== UBUS_STATUS_PERMISSION_DENIED) {
-			await updateIcon('unknown');
-		}
+		await updateIcon('unknown');
+		await updateBadge(null);
 		await saveSessionState({
+			lastStatus: null,
 			lastError: e.message,
 			lastPoll: Date.now(),
 		});
@@ -153,6 +151,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 	if (message.action === 'pollNow') {
 		pollStatus().then(() => sendResponse({ success: true }));
+		return true;
+	}
+
+	if (message.action === 'configSaved') {
+		saveSessionState({ sessionId: null })
+			.then(() => pollStatus())
+			.then(() => sendResponse({ success: true }));
 		return true;
 	}
 });

@@ -3,8 +3,9 @@
 import { login, getInitStatus } from '../lib/ubus-client.js';
 import { getConfig, saveConfig } from '../lib/state.js';
 
+const API_USERNAME = 'adblock-fast-api';
+
 const elRouterUrl = document.getElementById('routerUrl');
-const elUsername = document.getElementById('username');
 const elPassword = document.getElementById('password');
 const elPollInterval = document.getElementById('pollInterval');
 const btnTest = document.getElementById('btnTest');
@@ -24,7 +25,6 @@ function hideMessage() {
 async function loadSettings() {
 	const config = await getConfig();
 	elRouterUrl.value = config.routerUrl || '';
-	elUsername.value = config.username || 'adblock-fast-api';
 	elPassword.value = config.password || '';
 	elPollInterval.value = config.pollInterval || 30;
 }
@@ -32,7 +32,7 @@ async function loadSettings() {
 async function saveSettings() {
 	const config = {
 		routerUrl: elRouterUrl.value.trim().replace(/\/+$/, ''),
-		username: elUsername.value.trim(),
+		username: API_USERNAME,
 		password: elPassword.value,
 		pollInterval: Math.max(10, Math.min(240, parseInt(elPollInterval.value) || 30)),
 	};
@@ -41,31 +41,26 @@ async function saveSettings() {
 		showMessage('Router URL is required.', 'error');
 		return;
 	}
-	if (!config.username) {
-		showMessage('Username is required.', 'error');
-		return;
-	}
 	if (!config.password) {
-		showMessage('Password is required.', 'error');
+		showMessage('Remote Access Token is required.', 'error');
 		return;
 	}
 
 	await saveConfig(config);
 	showMessage('Settings saved.', 'success');
 
-	// Trigger an immediate poll
-	chrome.runtime.sendMessage({ action: 'pollNow' });
+	// Clear old session and trigger an immediate poll
+	chrome.runtime.sendMessage({ action: 'configSaved' });
 }
 
 async function testConnection() {
 	hideMessage();
 
 	const routerUrl = elRouterUrl.value.trim().replace(/\/+$/, '');
-	const username = elUsername.value.trim();
 	const password = elPassword.value;
 
-	if (!routerUrl || !username || !password) {
-		showMessage('Please fill in all fields first.', 'error');
+	if (!routerUrl || !password) {
+		showMessage('Please fill in Router URL and Remote Access Token first.', 'error');
 		return;
 	}
 
@@ -73,13 +68,23 @@ async function testConnection() {
 	btnTest.textContent = 'Testing...';
 
 	try {
-		const session = await login(routerUrl, username, password);
+		const session = await login(routerUrl, API_USERNAME, password);
 		const status = await getInitStatus(routerUrl, session.sessionId);
 
 		let msg = 'Connection successful!';
 		if (status.version) msg += ' Service version: ' + status.version + '.';
 		if (status.entries) msg += ' Blocking ' + status.entries + ' domains.';
 		showMessage(msg, 'success');
+
+		// Auto-save settings and trigger fresh poll to update icon
+		const config = {
+			routerUrl: routerUrl,
+			username: API_USERNAME,
+			password: password,
+			pollInterval: Math.max(10, Math.min(240, parseInt(elPollInterval.value) || 30)),
+		};
+		await saveConfig(config);
+		chrome.runtime.sendMessage({ action: 'configSaved' });
 	} catch (e) {
 		let msg = 'Connection failed: ' + e.message;
 		if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
