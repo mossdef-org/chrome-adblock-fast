@@ -1,7 +1,7 @@
 'use strict';
 
 import { login, getInitStatus } from '../lib/ubus-client.js';
-import { getConfig, saveConfig } from '../lib/state.js';
+import { getConfig, saveConfig, requestHostPermission } from '../lib/state.js';
 
 const API_USERNAME = 'adblock-fast-api';
 
@@ -68,6 +68,12 @@ async function testConnection() {
 	btnTest.textContent = 'Testing...';
 
 	try {
+		const granted = await requestHostPermission(routerUrl);
+		if (!granted) {
+			showMessage('Host permission denied. The extension needs access to your router to function.', 'error');
+			return;
+		}
+
 		const session = await login(routerUrl, API_USERNAME, password);
 		const status = await getInitStatus(routerUrl, session.sessionId);
 

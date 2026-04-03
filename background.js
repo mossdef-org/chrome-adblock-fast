@@ -15,6 +15,7 @@ import {
 	getConfig,
 	getSessionState,
 	saveSessionState,
+	hasHostPermission,
 } from './lib/state.js';
 
 const ALARM_NAME = 'poll-status';
@@ -37,6 +38,11 @@ async function ensureSession(config) {
 async function pollStatus() {
 	const config = await getConfig();
 	if (!config.routerUrl) {
+		await updateIcon('unknown');
+		return;
+	}
+
+	if (!await hasHostPermission(config.routerUrl)) {
 		await updateIcon('unknown');
 		return;
 	}
