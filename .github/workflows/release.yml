@@ -62,3 +62,14 @@ jobs:
           name: v${{ steps.version.outputs.version }} (build ${{ github.run_number }})
           files: chrome-adblock-fast-${{ steps.version.outputs.version }}.zip
           generate_release_notes: true
+
+      - name: Upload to Chrome Web Store
+        if: github.event_name == 'push' && !startsWith(github.ref, 'refs/pull/')
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: chrome-adblock-fast-${{ steps.version.outputs.version }}.zip
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          publish: true
