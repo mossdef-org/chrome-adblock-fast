@@ -35,10 +35,16 @@ jobs:
           VERSION=$(jq -r '.version' manifest.json)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Sync info.json version from manifest
+        run: |
+          jq --arg v "${{ steps.version.outputs.version }}" '.version = $v' info.json > info.json.tmp
+          mv info.json.tmp info.json
+
       - name: Create packed extension (zip)
         run: |
           zip -r "chrome-adblock-fast-${{ steps.version.outputs.version }}.zip" \
             manifest.json \
+            info.json \
             background.js \
             popup/ \
             settings/ \
