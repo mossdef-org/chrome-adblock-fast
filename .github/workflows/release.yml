@@ -27,7 +27,7 @@ jobs:
           node-version: '22'
 
       - name: Generate icons
-        run: node scripts/generate-icons.js
+        run: node scripts/recolor-icons.js
 
       - name: Get version from manifest
         id: version
