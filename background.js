@@ -70,7 +70,7 @@ async function pollStatus() {
 		const state = resolveState(status, session.pauseEndTime);
 		const compatWarning = checkCompat(status);
 		await updateIcon(state);
-		await updateBadge(status);
+		await updateBadge(status, state);
 		await saveSessionState({
 			lastStatus: status,
 			lastPoll: Date.now(),
@@ -108,6 +108,7 @@ async function handleAction(action) {
 
 			await saveSessionState({ pauseEndTime: pauseEndTime });
 			await updateIcon('paused');
+			await updateBadge(null, 'paused');
 			return { success: true, pauseEndTime: pauseEndTime };
 		}
 
